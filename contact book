@@ -21,10 +21,11 @@ class Phone(Field):
         self.value.remove(number)
 
 class Record:
-    def __init__(self, name):
-        self.name = Name(name)
-        self.phones = []
-
+    def __init__(self, name, *phones):
+        self.name = name
+        self.phones = list(phones)
+        self.fields = [name] + list(phones)
+    
     def add_phone(self, phone):
         self.phones.append(phone)
 
@@ -41,6 +42,9 @@ class Record:
 class AddressBook:
     def __init__(self):
         self.data = {}
+    
+    def __getitem__(self, name):
+        return self.data[name]
 
     def add_record(self, record):
         self.data[record.name.value] = record
@@ -63,28 +67,20 @@ class AddressBook:
                         break
             if match:
                 results.append(record)
-        return results
+        return results 
 
-# Приклад використання
 
-address_book = AddressBook()
-
-# Додати записи
-record1 = Record("John")
-phone1 = Phone("123456789")
-phone2 = Phone("987654321")
-record1.add_phone(phone1)
-record1.add_phone(phone2)
-address_book.add_record(record1)
-
-record2 = Record("Jane")
-phone3 = Phone("555555555")
-record2.add_phone(phone3)
-address_book.add_record(record2)
-
-# Пошук записів
-results = address_book.search_records(name="John")
-print(results)
-results = address_book.search_records(phone="555555555")
-print(results) 
+if __name__ == "__main__":
+    name = Name('Bill')
+    phone = Phone('1234567890')
+    rec = Record(name, phone)
+    ab = AddressBook()
+    ab.add_record(rec)
+    assert isinstance(ab['Bill'], Record)
+    assert isinstance(ab['Bill'].name, Name)
+    assert isinstance(ab['Bill'].fields, list)
+    assert isinstance(ab['Bill'].fields[0], Name)
+    assert isinstance(ab['Bill'].fields[1], Phone)
+    assert ab['Bill'].fields[1].value == '1234567890' 
+    print('All Ok)')
 
